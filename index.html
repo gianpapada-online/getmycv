@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Request My CV — Giannis Papadantonakis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="color-scheme" content="dark light" />
+  <style>
+    :root{
+      --bg:#0b0f17; --card:#121826; --muted:#9aa3b2; --text:#e7ecf3;
+      --stroke:#212a40; --accent:#62a8ff; --accent-2:#7ed2ff; --ok:#30d158; --err:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif,system-ui,Segoe UI,Inter,Roboto,Arial,sans-serif;
+      color:var(--text);
+      /* Layered background: SVG dots pattern + soft gradients */
+      background:
+        /* subtle SVG dot grid (data URL) */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'><circle cx='1.5' cy='1.5' r='1' fill='%231e2840' /><circle cx='19.5' cy='19.5' r='1' fill='%231e2840' /></svg>"),
+        radial-gradient(1200px 600px at 15% -10%, #18315740, transparent 70%),
+        radial-gradient(900px 500px at 80% 120%, #00446633, transparent 70%),
+        linear-gradient(180deg,#0a0e15,#0b0f17 60%,#0a0e15);
+      background-attachment: fixed, fixed, fixed, fixed;
+      background-size: auto, auto, auto, auto;
+      display:grid; place-items:center; padding:24px;
+    }
+    .shell{width:100%; max-width:720px}
+    .card{
+      background:var(--card); border:1px solid var(--stroke); border-radius:20px; padding:28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      backdrop-filter: blur(4px);
+    }
+    .card:hover{ transform: translateY(-1px); box-shadow: 0 26px 70px rgba(0,0,0,.45); border-color:#273459; }
+    header{display:flex; align-items:center; gap:14px; margin-bottom:10px}
+    .logo{
+      width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-weight:800;
+      color:white; background: linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow: 0 8px 24px rgba(98,168,255,.35);
+    }
+    h1{margin:0; font-size:22px; letter-spacing:.2px}
+    p.lead{margin:6px 0 20px; color:var(--muted)}
+    label{display:block; font-size:14px; margin:12px 0 6px; color:#c9d2e3}
+    input[type="email"]{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid #2a3552; background:#0c1220; color:var(--text);
+      outline:none; transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    input::placeholder{color:#7f8ba4}
+    input:focus{ border-color:#37508a; box-shadow: 0 0 0 4px #2a3e6b55; }
+    .consent{display:flex; gap:10px; align-items:flex-start; margin-top:10px; font-size:14px; color:#cdd6e6}
+    .consent input{margin-top:2px}
+    .btn{
+      width:100%; margin-top:16px; padding:12px 16px; border:0; border-radius:12px; font-weight:700; letter-spacing:.2px;
+      cursor:pointer; background: linear-gradient(135deg,var(--accent),var(--accent-2)); color:#0b0f17;
+      transition: transform .06s ease, filter .15s ease;
+    }
+    .btn:active{ transform: translateY(1px) }
+    .hp{ display:none !important }
+    .msg{ margin-top:12px; font-size:14px; display:none }
+    .msg.err{ color:var(--err) }
+    /* success card */
+    .success{
+      display:none; text-align:center; padding:28px; border-radius:20px;
+      border:1px solid var(--stroke); background:var(--card)
+    }
+    .check{
+      width:56px; height:56px; border-radius:50%; display:grid; place-items:center; margin:0 auto 8px;
+      background: radial-gradient(#3be281, #19c26a);
+      box-shadow: 0 12px 32px rgba(25,194,106,.35);
+      animation: pop .38s ease-out;
+    }
+    @keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card" id="formCard" aria-live="polite">
+      <header>
+        <div class="logo">G</div>
+        <div>
+          <h1>Request my CV</h1>
+          <p class="lead">Drop your email and I’ll send my latest CV to your inbox.</p>
+        </div>
+      </header>
+
+      <!-- Hidden IFRAME to avoid navigation to Zapier -->
+      <iframe name="zapier_iframe" class="hp" aria-hidden="true"></iframe>
+
+      <form id="cvForm" action="https://hooks.zapier.com/hooks/catch/22387988/20o6e70/" method="POST" target="zapier_iframe" onsubmit="return submitCV(event)">
+        <label for="email">Work email</label>
+        <input id="email" name="email" type="email" placeholder="name@company.com" required inputmode="email" autocomplete="email" />
+
+        <div class="hp">
+          <!-- Honeypot -->
+          <label for="website">Website</label>
+          <input id="website" name="website" type="text" autocomplete="off" />
+        </div>
+
+        <div class="consent">
+          <input id="consent" name="consent" type="checkbox" required />
+          <label for="consent">I agree to receive one email with the CV. No newsletter, no spam. Your email will not be stored.</label>
+        </div>
+
+        <input type="hidden" name="client_hint" value="cv-request-v3-svgpattern" />
+
+        <button class="btn" id="submitBtn" type="submit">Send me the CV</button>
+        <div id="errMsg" class="msg err" role="alert"></div>
+      </form>
+    </div>
+
+    <!-- Success state -->
+    <div class="success" id="successCard" role="status" aria-live="polite">
+      <div class="check">✔</div>
+      <h2 style="margin:8px 0 4px;">Check your inbox</h2>
+      <p class="lead" style="margin:0;">If the address was valid, my CV is on its way.</p>
+      <p class="msg" style="margin-top:8px;color:var(--muted)">Didn’t get it? Check spam or try again.</p>
+    </div>
+  </div>
+
+  <script>
+    function submitCV(e){
+      const email = document.getElementById('email').value.trim();
+      const website = document.getElementById('website').value.trim(); // honeypot
+      const consent = document.getElementById('consent').checked;
+      const err = document.getElementById('errMsg');
+      const btn = document.getElementById('submitBtn');
+
+      err.style.display = 'none'; err.textContent = '';
+
+      // bot trap
+      if(website !== ''){
+        e.preventDefault();
+        err.textContent = 'Bot detected.'; err.style.display = 'block';
+        return false;
+      }
+
+      // email + consent validation
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if(!ok || !consent){
+        e.preventDefault();
+        err.textContent = 'Please enter a valid email and tick consent.'; err.style.display = 'block';
+        return false;
+      }
+
+      // optimistic success UX
+      btn.disabled = true; btn.textContent = 'Sending…';
+
+      setTimeout(() => {
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('successCard').style.display = 'block';
+      }, 1200);
+
+      return true; // let form post via hidden iframe
+    }
+  </script>
+</body>
+</html>
